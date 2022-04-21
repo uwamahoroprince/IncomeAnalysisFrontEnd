@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const SideBar = () => {
   return (
@@ -11,34 +12,34 @@ const SideBar = () => {
                 <span>Main</span>
               </li>
               <li className="active">
-                <a href="index.html">
+                <Link to="/">
                   <i data-feather="home"></i> <span>Dashboard</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="customers.html">
+                <Link to="/accounts">
                   <i data-feather="users"></i> <span>Accounts</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="estimates.html">
+                <Link to="/activities">
                   <i data-feather="file-text"></i> <span>Activity</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="invoices.html">
+                <Link to="/budgetPlan">
                   <i data-feather="clipboard"></i> <span>BudgetPlan</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="payments.html">
+                <Link to="/clients" href="index.html">
                   <i data-feather="credit-card"></i> <span>Customers</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="expenses.html">
-                  <i data-feather="package"></i> <span>Memership</span>
-                </a>
+                <Link to="/subscription">
+                  <i data-feather="package"></i> <span>SubScription</span>
+                </Link>
               </li>
               <li>
                 <a href="expenses.html">
