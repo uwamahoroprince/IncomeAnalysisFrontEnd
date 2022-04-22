@@ -2,10 +2,11 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal/lib/components/Modal";
 import { url } from "../../constants/url";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
-
+import "react-toastify/dist/ReactToastify.css";
+toast.configure();
 const MemberShip = () => {
   const [activity, setActivity] = useState([]);
   const [allClient, setAllClient] = useState([]);
@@ -19,45 +20,30 @@ const MemberShip = () => {
   const [updateId, setUpdateId] = useState("");
   const [status, setStatus] = useState(false);
 
-  const isFound = false;
+  function toastfy(message) {
+    toast(message);
+  }
   const handleSubmit = async (event) => {
     let response;
     event.preventDefault();
 
     try {
       if (!status) {
-        response = await fetch(`${url.memberShip}`, {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            activity: activity,
-            client: client._id,
-            startDate: startDate,
-            endDate: endDate,
-          }),
+        response = await axios.post(`${url.memberShip}`, {
+          activity: activity,
+          client: client,
+          startDate: startDate,
+          endDate: endDate,
         });
       } else {
-        response = await fetch(`${url.memberShip}/${updateId}`, {
-          method: "PUT",
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            activity: activity,
-            client: client._id,
-            startDate: startDate,
-            endDate: endDate,
-          }),
+        response = await axios.put(`${url.memberShip}/${updateId}`, {
+          activity: activity.value,
+          client: client,
+          startDate: startDate,
+          endDate: endDate,
         });
       }
       setStatus(false);
-      console.log(activity);
     } catch (error) {
       console.log(error);
     }
@@ -65,25 +51,28 @@ const MemberShip = () => {
     setStartDate("");
     setEndDate("");
     setResponseMessage(response.statusText);
-    toast(responseMessage);
+    toastfy(response.data.message);
     closeModal();
+    console.log(response);
   };
   const getData = async () => {
     try {
       const allData = await axios.get(`${url.memberShip}`);
-
       setAllData(allData.data.data);
     } catch (error) {
       console.log(error);
     }
   };
+
   const deleteData = async (id) => {
+    let allData;
     try {
-      const allData = await axios.delete(`${url.activity}/${id}`);
+      allData = await axios.delete(`${url.memberShip}/${id}`);
       setResponseMessage(allData.data.message);
     } catch (error) {
       console.log(error);
     }
+    toast(allData.data.message);
   };
   const getClients = async () => {
     try {
@@ -111,14 +100,23 @@ const MemberShip = () => {
     }
   };
   const handleChange = (data) => {
-    console.log(data);
     setActivity(data);
+  };
+  const findClient = async (id) => {
+    try {
+      const response = await axios.get(`${url.client}/${id}`);
+      const clientName = response.data.data;
+      return "" + clientName.name + "";
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
     getData();
     getClients();
     getActivities();
-  }, []);
+    console.log("running");
+  }, [responseMessage]);
   const customCatStyles = {
     content: {
       top: "10%",
@@ -210,7 +208,11 @@ const MemberShip = () => {
                         allData.map((data, index) => (
                           <tr>
                             <td className="items-text">{data.activity.name}</td>
-                            <td>{data.client.name}</td>
+                            <td className="items-text">
+                              {/* {findClient(data.client)
+                                .then((cl) => <span>{cl}</span>)
+                                .catch((error) => console.log(error))} */}
+                            </td>
                             <td className="items-text">{data.startDate}</td>
                             <td className="items-text">{data.endDate}</td>
                             <td className="items-text">{data.status}</td>
@@ -285,14 +287,13 @@ const MemberShip = () => {
                       <div className="form-group">
                         <label>Client</label>
                         <select
-                          onChange={(client) =>
-                            setClient(client.currentTarget.value)
-                          }
+                          onChange={(client) => setClient(client.target.value)}
                           className="form-select form-control"
                         >
+                          <option>Select Client</option>
                           {allClient.length != 0 ? (
                             allClient.map((data, index) => (
-                              <option key={index} value={data}>
+                              <option key={index} value={data._id}>
                                 {data.name}
                               </option>
                             ))
