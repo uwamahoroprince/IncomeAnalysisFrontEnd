@@ -13,59 +13,76 @@ const SideBar = () => {
               </li>
               <li className="active">
                 <Link to="/">
-                  <i data-feather="home"></i> <span>Dashboard</span>
+                  <i className="fa-solid fa-gauge" data-feather="home"></i>{" "}
+                  <span>Dashboard</span>
                 </Link>
               </li>
               <li>
                 <Link to="/accounts">
-                  <i data-feather="users"></i> <span>Accounts</span>
+                  <i className="fa-solid fa-suitcase" data-feather="users"></i>{" "}
+                  <span>Accounts</span>
                 </Link>
               </li>
               <li>
                 <Link to="/activities">
-                  <i data-feather="file-text"></i> <span>Activity</span>
+                  <i
+                    className="fa-solid fa-dumbbell"
+                    data-feather="file-text"
+                  ></i>{" "}
+                  <span>Activity</span>
                 </Link>
               </li>
               <li>
                 <Link to="/budgetPlan">
-                  <i data-feather="clipboard"></i> <span>BudgetPlan</span>
+                  <i className="fa-solif fa-list" data-feather="clipboard"></i>{" "}
+                  <span>BudgetPlan</span>
                 </Link>
               </li>
               <li>
                 <Link to="/clients" href="index.html">
-                  <i data-feather="credit-card"></i> <span>Customers</span>
+                  <i
+                    className="fa-solid fa-person"
+                    data-feather="credit-card"
+                  ></i>
+                  <span>Customers</span>
                 </Link>
               </li>
               <li>
                 <Link to="/subscription">
-                  <i data-feather="package"></i> <span>SubScription</span>
+                  <i
+                    className="fa-solid fa-basketball"
+                    data-feather="package"
+                  ></i>{" "}
+                  <span>SubScription</span>
                 </Link>
               </li>
               <li>
-                <a href="expenses.html">
-                  <i data-feather="package"></i> <span>Transaction</span>
-                </a>
+                <Link to="/transactions">
+                  <i className="fas fa-dollar-sign" data-feather="package"></i>{" "}
+                  <span>Transaction</span>
+                </Link>
               </li>
               <li>
-                <a href="expenses.html">
-                  <i data-feather="package"></i> <span>Staff</span>
-                </a>
+                <Link to="/staff">
+                  <i class="fa-solid fa-users" data-feather="package"></i>{" "}
+                  <span>Staff</span>
+                </Link>
               </li>
               <li>
-                <a href="expenses.html">
+                <Link to="/sales">
                   <i data-feather="package"></i> <span>Sales Repots</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="expenses.html">
+                <Link to="/expense">
                   <i data-feather="package"></i> <span>Expense Reports</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="expenses.html">
+                <Link to="plf">
                   <i data-feather="package"></i>
                   <span>Profit &Loss Report</span>
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
