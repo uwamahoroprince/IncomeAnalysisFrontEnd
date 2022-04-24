@@ -69,19 +69,20 @@ const SideBar = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/sales">
+                <Link to="/salesReport">
                   <i data-feather="package"></i> <span>Sales Repots</span>
                 </Link>
               </li>
               <li>
                 <Link to="/expense">
-                  <i data-feather="package"></i> <span>Expense Reports</span>
+                  <i data-feather="package"></i>{" "}
+                  <span>Subscription Analytics</span>
                 </Link>
               </li>
               <li>
-                <Link to="plf">
+                <Link to="/analytics">
                   <i data-feather="package"></i>
-                  <span>Profit &Loss Report</span>
+                  <span>Income Analytics</span>
                 </Link>
               </li>
             </ul>

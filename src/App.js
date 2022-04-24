@@ -9,6 +9,8 @@ import Clients from "./pages/clients/clients";
 import Dashboard from "./pages/dashboard/dashboard";
 import MemberShip from "./pages/transaction/memberShip";
 import Transaction from "./pages/transaction/transaction";
+import IncomeAnalysis from "./pages/analytics/IncomeAnalytics";
+import SalesReport from "./pages/salesReport/salesReport";
 
 function App() {
   return (
@@ -53,6 +55,16 @@ function App() {
             <Switch>
               <Route path="/transactions">
                 <Transaction />
+              </Route>
+            </Switch>
+            <Switch>
+              <Route path="/analytics">
+                <IncomeAnalysis />
+              </Route>
+            </Switch>
+            <Switch>
+              <Route path="/salesReport">
+                <SalesReport />
               </Route>
             </Switch>
           </div>
