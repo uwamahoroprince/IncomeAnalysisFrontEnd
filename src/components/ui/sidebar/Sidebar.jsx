@@ -62,26 +62,27 @@ const SideBar = () => {
                   <span>Transaction</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/staff">
                   <i class="fa-solid fa-users" data-feather="package"></i>{" "}
                   <span>Staff</span>
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/salesReport">
-                  <i data-feather="package"></i> <span>Sales Repots</span>
+                  <i className="fa-solid fa-p" data-feather="package"></i>{" "}
+                  <span>Sales Repots</span>
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/expense">
                   <i data-feather="package"></i>{" "}
                   <span>Subscription Analytics</span>
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/analytics">
-                  <i data-feather="package"></i>
+                  <i className="fas fa-dollar-sign" data-feather="package"></i>
                   <span>Income Analytics</span>
                 </Link>
               </li>

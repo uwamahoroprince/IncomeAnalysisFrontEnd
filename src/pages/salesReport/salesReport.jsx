@@ -14,38 +14,37 @@ import {
   Pie,
   Cell,
 } from "recharts";
+const COLORS = ["#0088FE", "#00C49F"];
 
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  index,
+}) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 const SalesReport = () => {
-  const COLORS = ["#0088FE", "#00C49F"];
-
-  const RADIAN = Math.PI / 180;
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    index,
-  }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {`${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
-  let barData = [];
-  const valuePairState = [];
+  const [barData, setBarData] = useState();
+  let valuePairState = [];
   const getAllTransactions = async () => {
     try {
       let expensePerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -87,12 +86,21 @@ const SalesReport = () => {
           }
         }
       }
-
-      //   console.log(valuePairState);
+      let newData = [];
+      for (const key in valuePairState) {
+        newData.push({
+          name: `${valuePairState[key].month}`,
+          Expense: valuePairState[key].x,
+          Income: valuePairState[key].y,
+          amt: valuePairState[key].x,
+        });
+      }
+      setBarData(newData);
     } catch (error) {
       console.log(error);
     }
   };
+  console.log(barData);
   const getAllSubscription = async () => {
     try {
       const response = await axios.get(`${url.memberShip}`);
@@ -101,19 +109,7 @@ const SalesReport = () => {
       console.log(error);
     }
   };
-  for (const key in valuePairState) {
-    barData.push({
-      name: `${valuePairState[key].month}`,
-      uv: valuePairState[key].x,
-      pv: valuePairState[key].x,
-      amt: valuePairState[key].x,
-    });
-  }
-  useEffect(() => {
-    getAllTransactions();
-    getAllSubscription();
-    console.log(barData);
-  }, []);
+
   const customCatStyles = {
     content: {
       top: "10%",
@@ -145,34 +141,16 @@ const SalesReport = () => {
   function closeModal() {
     setIsOpen(false);
   }
-  <Modal
-    isOpen={modalIsOpen}
-    onAfterOpen={afterOpenModal}
-    onRequestClose={closeModal}
-    style={customCatStyles}
-    contentLabel="Example Modal"
-  >
-    <form className="modal-dialog modal-dialog-centered modal-lg" novalidate="">
-      <div className="modal-content">
-        <div className="modal-header">
-          <div className="form-header text-start mb-0">
-            <h4 className="mb-0">Create New Account</h4>
-          </div>
-        </div>
-        <div className="modal-body">
-          <div className="bank-inner-details">
-            <div className="row"></div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </Modal>;
+  useEffect(() => {
+    getAllTransactions();
+    getAllSubscription();
+  }, []);
   return (
     <>
       <div className="m-5">
         <nav aria-label="breadcrumb ">
           <ol
-            class="breadcrumb bg-2"
+            className="breadcrumb bg-2"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -180,7 +158,7 @@ const SalesReport = () => {
             }}
           >
             <li
-              class="breadcrumb-item active h6 text-black"
+              className="breadcrumb-item active h6 text-black"
               aria-current="page"
             >
               Sales Over Time
@@ -197,26 +175,26 @@ const SalesReport = () => {
             >
               Chart
             </a>
-            <i
+            {/* <i
               style={{ marginLeft: "25px" }}
               className="fa-solid fa-table "
             ></i>
-            <span className="btn">Table</span>
+            <span className="btn">Table</span> */}
           </ol>
         </nav>
 
         <nav aria-label="breadcrumb ">
           <ol
-            class="breadcrumb bg-2"
-            class="breadcrumb bg-2"
+            className="breadcrumb bg-2"
+            className="breadcrumb bg-2"
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <li
-              class="breadcrumb-item active h6 text-black"
+            {/* <li
+              className="breadcrumb-item active h6 text-black"
               aria-current="page"
             >
               Sales By Item
@@ -237,7 +215,7 @@ const SalesReport = () => {
               style={{ marginLeft: "25px" }}
               className="fa-solid fa-table "
             ></i>
-            <span className="cursor-pointer btn">Table</span>
+            <span className="cursor-pointer btn">Table</span> */}
           </ol>
         </nav>
       </div>
@@ -278,11 +256,11 @@ const SalesReport = () => {
                     <Tooltip />
                     <Legend />
                     <Bar
-                      dataKey="pv"
+                      dataKey="Income"
                       fill="#8884d8"
                       background={{ fill: "#eee" }}
                     />
-                    <Bar dataKey="uv" fill="#82ca9d" />
+                    <Bar dataKey="Expense" fill="#82ca9d" />
                   </BarChart>
                 </div>
               </div>

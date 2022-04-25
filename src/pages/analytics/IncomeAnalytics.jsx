@@ -4,6 +4,7 @@ import axios from "axios";
 import * as tf from "@tensorflow/tfjs";
 
 const IncomeAnalysis = () => {
+  const [mapData, setMapData] = useState([]);
   const valuePairState = [];
   const [modelState, setModelState] = useState({
     model: null,
@@ -52,7 +53,7 @@ const IncomeAnalysis = () => {
           }
         }
       }
-
+      setMapData(valuePairState);
       //   console.log(valuePairState);
     } catch (error) {
       console.log(error);
@@ -115,19 +116,52 @@ const IncomeAnalysis = () => {
   }, []);
   return (
     <>
-      <input
-        type="number"
-        value={modelState.valueToPredict}
-        name="valueToPredict"
-        onChange={handelModelChange}
-        placeholder="enter a number"
-      />
+      <div className="content container-fluid">
+        <div className="page-header">
+          <table className="table table-stripped table-hover datatable">
+            <thead className="thead-light">
+              <tr>
+                <th>Month</th>
+                <th>Expense</th>
+                <th>Income</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mapData.length != 0 ? (
+                mapData.map((data) => (
+                  <tr>
+                    <td>{data.month}</td>
+                    <td className="text-primary">{data.x}</td>
 
-      <button onClick={handlePredict} disabled={!modelState.trained}>
-        Predict
-      </button>
-      <button onClick={trainHandler}>Train</button>
-      <div className="m-2">{modelState.predictedValue}</div>
+                    <td className="items-primary">{data.y}</td>
+                  </tr>
+                ))
+              ) : (
+                <span>no train data</span>
+              )}
+            </tbody>
+          </table>
+
+          <br />
+          <input
+            type="number"
+            value={modelState.valueToPredict}
+            name="valueToPredict"
+            onChange={handelModelChange}
+            placeholder="enter a number"
+          />
+
+          <button onClick={handlePredict} disabled={!modelState.trained}>
+            Predict
+          </button>
+          <button onClick={trainHandler}>Train</button>
+          <div className="m-2">
+            <span className="h6">Predicted Income </span>
+            <br />
+            {modelState.predictedValue}
+          </div>
+        </div>
+      </div>
     </>
   );
 };

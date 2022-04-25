@@ -1,19 +1,23 @@
 import React from "react";
+import logo from "../../../img/nlogo1.jpeg";
 
 const TopBar = () => {
   return (
     <>
       <div className="header">
         <div className="header-left">
-          <a href="index.html" className="logo">
-            {/* <img src="assets/img/logo.png" alt="Logo" /> */}
-            Logo
+          <a href="#" className="logo">
+            <img
+              style={{ width: "100px", height: "150px" }}
+              src={logo}
+              alt="no logo"
+            />
           </a>
         </div>
 
-        <a href="javascript:void(0);" id="toggle_btn">
+        {/* <a href="javascript:void(0);" id="toggle_btn">
           <i className="fas fa-bars"></i>
-        </a>
+        </a> */}
         <a className="mobile_btn" id="mobile_btn">
           <i className="fas fa-bars"></i>
         </a>
