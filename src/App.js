@@ -11,63 +11,86 @@ import MemberShip from "./pages/transaction/memberShip";
 import Transaction from "./pages/transaction/transaction";
 import IncomeAnalysis from "./pages/analytics/IncomeAnalytics";
 import SalesReport from "./pages/salesReport/salesReport";
+import Staff from "./pages/staff/staff";
+import Login from "./pages/login/login";
 
 function App() {
+  const user = localStorage.getItem("token");
   return (
     <div className="App">
       <Router>
         <div className="main-wrapper">
-          <TopBar />
-          <SideBar />
+          {user ? (
+            <>
+              <TopBar />
+              <SideBar />
+            </>
+          ) : (
+            <Login />
+          )}
 
-          <div className="page-wrapper">
-            <Switch>
-              <Route exact path="/">
-                <Dashboard />
-                <Chart />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/accounts">
-                <Accounts />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/activities">
-                <Activity />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/clients">
-                <Clients />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/subscription">
-                <MemberShip />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/budgetPlan">
-                <BudgetPlan />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/transactions">
-                <Transaction />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/analytics">
-                <IncomeAnalysis />
-              </Route>
-            </Switch>
-            <Switch>
-              <Route path="/salesReport">
-                <SalesReport />
-              </Route>
-            </Switch>
-          </div>
+          {user ? (
+            <div className="page-wrapper">
+              <Switch>
+                <Route exact path="/">
+                  <Dashboard />
+                  <Chart />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/accounts">
+                  <Accounts />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/activities">
+                  <Activity />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/clients">
+                  <Clients />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/subscription">
+                  <MemberShip />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/budgetPlan">
+                  <BudgetPlan />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/transactions">
+                  <Transaction />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/analytics">
+                  <IncomeAnalysis />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/salesReport">
+                  <SalesReport />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/staff">
+                  <Staff />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/login">
+                  <Login />
+                </Route>
+              </Switch>
+            </div>
+          ) : (
+            <span></span>
+          )}
         </div>
       </Router>
     </div>

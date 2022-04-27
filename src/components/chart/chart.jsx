@@ -42,78 +42,134 @@ const renderCustomizedLabel = ({
   );
 };
 const Chart = () => {
-  const isfound = true;
-  let barData = [];
-  const pieData = [];
-  const [allTransaction, setAllTransaction] = useState([]);
-  let income = 0;
-  let expense = 0;
-  let total;
-  let monthInWords = [
+  const allMonths = [
     "Jan",
     "Feb",
-    "April",
     "Mar",
+    "April",
     "May",
     "June",
     "July",
     "Aug",
     "Sept",
-    "oct",
+    "Oct",
     "Nov",
     "Dec",
   ];
-  const getAllTransactions = async () => {
+  const isfound = true;
+  const pieData = [];
+
+  const [barData, setBarData] = useState();
+  const [amountFromActivity, setAmountFromActivity] = useState(0);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpense, setTotalExpense] = useState(0);
+  const [total, setTotal] = useState(0);
+  let valuePairState = [];
+  const getAllSubscriptions = async () => {
+    let addedAmount = 0;
     try {
-      const response = await axios.get(`${url.transaction}`);
-      if (isfound) {
-        const data = response.data.data;
-        setAllTransaction(data);
+      const response = await axios.get(`${url.memberShip}`);
+      const data = response.data.data;
+      for (const key in data) {
+        for (const innerKey in data[key].activity) {
+          console.log();
+          let id = data[key].activity[innerKey];
+          console.log(`${url.activity}/${id}`);
+          let response = await axios.get(`${url.activity}/${id}`);
+          const amount = response.data.data.amountPermonth;
+          addedAmount = addedAmount + amount;
+        }
       }
+      setAmountFromActivity(addedAmount);
     } catch (error) {
       console.log(error);
     }
   };
+  const getAllTransactions = async () => {
+    let exp = 0;
+    let inc = 0;
+    try {
+      let expensePerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let incomePerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const response = await axios.get(`${url.transaction}`);
+      const data = response.data.data;
 
-  for (const key in allTransaction) {
-    let date = new Date(allTransaction[key].createdAt);
-    let amount = allTransaction[key].amount;
-    let month = date.getMonth() + 1;
-    let monthInWord;
-    let uv = amount;
-    let pv = amount;
-    let amt = amount;
-    if (allTransaction[key].type === "income") {
-      income = income + allTransaction[key].amount;
-    } else {
-      expense = expense + allTransaction[key].amount;
-    }
-    total = income + expense;
-    for (let i = 1; i <= 12; i++) {
-      if (i === month) {
-        monthInWord = monthInWords[i];
-        break;
+      for (const key in data) {
+        let month = new Date(data[key].createdAt).getMonth() + 1;
+        if (data[key].type === "expense") {
+          exp = exp + data[key].amount;
+          expensePerMonth[month] = expensePerMonth[month] + data[key].amount;
+        } else {
+          inc = inc + data[key].amount;
+          incomePerMonth[month] = incomePerMonth[month] + data[key].amount;
+        }
+
+        let index = valuePairState.findIndex((el) => el.month === month);
+        // console.log(index);
+        if (index != -1) {
+          valuePairState[index] = {
+            month: month,
+            x: expensePerMonth[month],
+            y: incomePerMonth[month],
+          };
+          //   console.log(valuePairState);
+        } else {
+          if (data[key].type === "expense") {
+            valuePairState.push({
+              month: month,
+              x: data[key].amount,
+              y: 0,
+            });
+            // console.log(valuePairState);
+          } else {
+            valuePairState.push({
+              month: month,
+              x: 0,
+              y: data[key].amount,
+            });
+            // console.log(valuePairState);
+          }
+        }
       }
+      let newData = [];
+
+      for (const key in valuePairState) {
+        let monthInWord;
+        for (let i = 1; i <= 12; i++) {
+          if (i == valuePairState[key].month) {
+            monthInWord = allMonths[i];
+          }
+        }
+
+        newData.push({
+          name: `${monthInWord}`,
+          Expense: valuePairState[key].x,
+          Income: valuePairState[key].y + amountFromActivity,
+          amt: valuePairState[key].x,
+        });
+      }
+      setBarData(newData);
+    } catch (error) {
+      console.log(error);
     }
-    barData.push({
-      name: `${monthInWord}`,
-      uv: uv,
-      pv: pv,
-      amt: amt,
-    });
-  }
+    setTotalExpense(exp);
+    setTotalIncome(inc + amountFromActivity);
+  };
   pieData.push(
     {
-      name: "income",
-      value: income,
+      name: "Income",
+      value: totalIncome,
     },
     {
-      name: "income",
-      value: expense,
+      name: "Expense",
+      value: totalExpense,
     }
   );
   useEffect(() => {
     getAllTransactions();
+    getAllSubscriptions();
+    // getTotalAmountFromSubscription();
+
     return () => {
       isfound = false;
     };
@@ -134,22 +190,24 @@ const Chart = () => {
                   <div>
                     <span>Total</span>
                     <p className="h5 text-primary me-5">
-                      {total} <span className="h6 text-dark">Rwf</span>
+                      {totalExpense + totalIncome}
+                      <span className="h6 text-dark">Rwf</span>
                     </p>
                   </div>
                   <div>
                     <span>Expenses</span>
                     <p className="h5 text-danger me-5">
-                      {expense} <span className="h6 text-dark">Rwf</span>
+                      {totalExpense} <span className="h6 text-dark">Rwf</span>
                     </p>
                   </div>
                   <div>
                     <span>Income</span>
                     <p className="h5 text-dark me-5">
-                      {income} <span className="h6 text-dark">Rwf</span>
+                      {totalIncome} <span className="h6 text-dark">Rwf</span>
                     </p>
                   </div>
-                </div>
+                </div>{" "}
+                *
               </div>
               <div id="sales_chart">
                 <BarChart
@@ -169,11 +227,11 @@ const Chart = () => {
                   <Tooltip />
                   <Legend />
                   <Bar
-                    dataKey="pv"
+                    dataKey="Income"
                     fill="#8884d8"
                     background={{ fill: "#eee" }}
                   />
-                  <Bar dataKey="uv" fill="#82ca9d" />
+                  <Bar dataKey="Expense" fill="#82ca9d" />
                 </BarChart>
               </div>
             </div>
@@ -227,14 +285,14 @@ const Chart = () => {
                   <Pie
                     data={pieData}
                     cx={200}
-                    cy={200}
+                    cy={150}
                     labelLine={false}
                     label={renderCustomizedLabel}
                     outerRadius={150}
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {barData.map((entry, index) => (
+                    {pieData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}

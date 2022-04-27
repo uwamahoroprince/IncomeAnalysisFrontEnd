@@ -2,6 +2,14 @@ import React from "react";
 import logo from "../../../img/nlogo1.jpeg";
 
 const TopBar = () => {
+  const logOut = () => {
+    try {
+      localStorage.setItem("token", "");
+      window.location.reload(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <>
       <div className="header">
@@ -23,31 +31,15 @@ const TopBar = () => {
         </a>
 
         <ul className="nav nav-tabs user-menu">
-          <li className="nav-item dropdown has-arrow flag-nav">
-            <a
-              className="nav-link dropdown-toggle"
-              data-bs-toggle="dropdown"
-              href="#"
-              role="button"
-            >
-              {/* <img src="assets/img/flags/us.png" alt="" height="20" /> */}
-              <span>English</span>
-            </a>
-          </li>
-
           <li className="nav-item dropdown has-arrow main-drop">
-            <a
-              href="#"
-              className="dropdown-toggle nav-link"
-              data-bs-toggle="dropdown"
-            >
+            <a href="#" data-bs-toggle="dropdown">
               <span className="user-img">
                 {/* <img src="assets/img/profiles/avatar-01.jpg" alt="" /> */}
                 <span className="status online"></span>
               </span>
-              <span>Admin</span>
+              <span onClick={logOut}>Log Out</span>
             </a>
-            <div className="dropdown-menu">
+            {/* <div className="dropdown-menu">
               <a className="dropdown-item" href="profile.html">
                 <i data-feather="user" className="me-1"></i> Profile
               </a>
@@ -57,7 +49,7 @@ const TopBar = () => {
               <a className="dropdown-item" href="login.html">
                 <i data-feather="log-out" className="me-1"></i> Logout
               </a>
-            </div>
+            </div> */}
           </li>
         </ul>
       </div>

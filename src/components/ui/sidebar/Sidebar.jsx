@@ -62,12 +62,12 @@ const SideBar = () => {
                   <span>Transaction</span>
                 </Link>
               </li>
-              {/* <li>
+              <li>
                 <Link to="/staff">
                   <i class="fa-solid fa-users" data-feather="package"></i>{" "}
                   <span>Staff</span>
                 </Link>
-              </li> */}
+              </li>
               <li>
                 <Link to="/salesReport">
                   <i className="fa-solid fa-p" data-feather="package"></i>{" "}

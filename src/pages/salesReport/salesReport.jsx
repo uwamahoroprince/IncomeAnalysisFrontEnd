@@ -43,19 +43,66 @@ const renderCustomizedLabel = ({
   );
 };
 const SalesReport = () => {
+  const allMonths = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "April",
+    "May",
+    "June",
+    "July",
+    "Aug",
+    "Sept",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const isfound = true;
+  const pieData = [];
+
   const [barData, setBarData] = useState();
+  const [amountFromActivity, setAmountFromActivity] = useState(0);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpense, setTotalExpense] = useState(0);
+  const [total, setTotal] = useState(0);
   let valuePairState = [];
+  const getAllSubscriptions = async () => {
+    let addedAmount = 0;
+    try {
+      const response = await axios.get(`${url.memberShip}`);
+      const data = response.data.data;
+
+      for (const key in data) {
+        for (const innerKey in data[key].activity) {
+          console.log();
+          let id = data[key].activity[innerKey];
+          console.log(`${url.activity}/${id}`);
+          let response = await axios.get(`${url.activity}/${id}`);
+          const amount = response.data.data.amountPermonth;
+          addedAmount = addedAmount + amount;
+        }
+      }
+      setAmountFromActivity(addedAmount);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const getAllTransactions = async () => {
+    let exp = 0;
+    let inc = 0;
     try {
       let expensePerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       let incomePerMonth = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       const response = await axios.get(`${url.transaction}`);
       const data = response.data.data;
+
       for (const key in data) {
         let month = new Date(data[key].createdAt).getMonth() + 1;
         if (data[key].type === "expense") {
+          exp = exp + data[key].amount;
           expensePerMonth[month] = expensePerMonth[month] + data[key].amount;
         } else {
+          inc = inc + data[key].amount;
           incomePerMonth[month] = incomePerMonth[month] + data[key].amount;
         }
 
@@ -87,29 +134,38 @@ const SalesReport = () => {
         }
       }
       let newData = [];
+
       for (const key in valuePairState) {
+        let monthInWord;
+        for (let i = 1; i <= 12; i++) {
+          if (i == valuePairState[key].month) {
+            monthInWord = allMonths[i];
+          }
+        }
+
         newData.push({
-          name: `${valuePairState[key].month}`,
-          Expense: valuePairState[key].x,
-          Income: valuePairState[key].y,
-          amt: valuePairState[key].x,
+          name: `${monthInWord}`,
+          Sales: valuePairState[key].y + amountFromActivity,
+          // amt: valuePairState[key].x,
         });
       }
       setBarData(newData);
     } catch (error) {
       console.log(error);
     }
+    setTotalExpense(exp);
+    setTotalIncome(inc + amountFromActivity);
   };
-  console.log(barData);
-  const getAllSubscription = async () => {
-    try {
-      const response = await axios.get(`${url.memberShip}`);
-      const data = response.data.data;
-    } catch (error) {
-      console.log(error);
+  pieData.push(
+    {
+      name: "Income",
+      value: totalIncome,
+    },
+    {
+      name: "Expense",
+      value: totalExpense,
     }
-  };
-
+  );
   const customCatStyles = {
     content: {
       top: "10%",
@@ -143,7 +199,12 @@ const SalesReport = () => {
   }
   useEffect(() => {
     getAllTransactions();
-    getAllSubscription();
+    getAllSubscriptions();
+    // getTotalAmountFromSubscription();
+
+    return () => {
+      isfound = false;
+    };
   }, []);
   return (
     <>
@@ -175,11 +236,11 @@ const SalesReport = () => {
             >
               Chart
             </a>
-            {/* <i
+            <i
               style={{ marginLeft: "25px" }}
               className="fa-solid fa-table "
             ></i>
-            <span className="btn">Table</span> */}
+            <span className="btn">Table</span>
           </ol>
         </nav>
 
@@ -193,7 +254,7 @@ const SalesReport = () => {
               alignItems: "center",
             }}
           >
-            {/* <li
+            <li
               className="breadcrumb-item active h6 text-black"
               aria-current="page"
             >
@@ -215,7 +276,7 @@ const SalesReport = () => {
               style={{ marginLeft: "25px" }}
               className="fa-solid fa-table "
             ></i>
-            <span className="cursor-pointer btn">Table</span> */}
+            <span className="cursor-pointer btn">Table</span>
           </ol>
         </nav>
       </div>
@@ -256,11 +317,10 @@ const SalesReport = () => {
                     <Tooltip />
                     <Legend />
                     <Bar
-                      dataKey="Income"
+                      dataKey="Sales"
                       fill="#8884d8"
                       background={{ fill: "#eee" }}
                     />
-                    <Bar dataKey="Expense" fill="#82ca9d" />
                   </BarChart>
                 </div>
               </div>
