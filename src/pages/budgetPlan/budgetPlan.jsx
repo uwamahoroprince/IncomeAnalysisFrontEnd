@@ -1,6 +1,9 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { url } from "../../constants/url";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const BudgetPlan = () => {
   const [form, setForm] = useState([]);
   const [status, setStatus] = useState("");
@@ -9,6 +12,9 @@ const BudgetPlan = () => {
   const [allAccount, setAllAcount] = useState([]);
   const [account, setAcount] = useState({});
   const [expectedIncome, setExpectedIncome] = useState("");
+  function toastMessage(message) {
+    toast(message);
+  }
 
   const handleOnAdNew = (event) => {
     event.preventDefault();
@@ -47,9 +53,11 @@ const BudgetPlan = () => {
         account: account._id,
         expectedIncome: expectedIncome,
       });
-      console.log(response);
+      const message = response.data.data.message;
+      toastMessage("BudgetPlan Created");
     } catch (error) {
       console.log(error);
+      toastMessage("error while creating budget");
     }
   };
   const getAccounts = async () => {
@@ -67,7 +75,12 @@ const BudgetPlan = () => {
   return (
     <form className="form-group mt-5 d-flex align-items-center justify-content-center">
       <fieldset className="border text-center border-dark">
-        <legend className="text-primary h4">Create New Budget Plan</legend>
+        <legend className="text-primary h4 d-flex justify-content-around">
+          Create New Budget Plan
+          <Link to="/budgetView" className="btn btn-success">
+            <span>Budget List</span>
+          </Link>
+        </legend>
         <div className="form-header modal-body" style={{ width: "620px" }}>
           <fieldset className="border text-center border-dark">
             <legend className="h6">Budget Period</legend>

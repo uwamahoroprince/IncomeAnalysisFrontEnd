@@ -244,7 +244,7 @@ const SalesReport = () => {
           </ol>
         </nav>
 
-        <nav aria-label="breadcrumb ">
+        {/* <nav aria-label="breadcrumb ">
           <ol
             className="breadcrumb bg-2"
             className="breadcrumb bg-2"
@@ -278,7 +278,7 @@ const SalesReport = () => {
             ></i>
             <span className="cursor-pointer btn">Table</span>
           </ol>
-        </nav>
+        </nav> */}
       </div>
       <Modal
         isOpen={modalIsOpen}

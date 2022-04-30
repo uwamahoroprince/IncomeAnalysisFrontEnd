@@ -13,6 +13,7 @@ import IncomeAnalysis from "./pages/analytics/IncomeAnalytics";
 import SalesReport from "./pages/salesReport/salesReport";
 import Staff from "./pages/staff/staff";
 import Login from "./pages/login/login";
+import BudgetView from "./pages/budgetPlan/budgetView";
 
 function App() {
   const user = localStorage.getItem("token");
@@ -85,6 +86,11 @@ function App() {
               <Switch>
                 <Route path="/login">
                   <Login />
+                </Route>
+              </Switch>
+              <Switch>
+                <Route path="/budgetView">
+                  <BudgetView />
                 </Route>
               </Switch>
             </div>

@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "../../../img/nlogo1.jpeg";
 
 const TopBar = () => {
   const logOut = () => {
     try {
       localStorage.setItem("token", "");
+      localStorage.setItem("role", "");
+      localStorage.setItem("user", "");
       window.location.reload(false);
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <>
       <div className="header">
@@ -37,7 +40,16 @@ const TopBar = () => {
                 {/* <img src="assets/img/profiles/avatar-01.jpg" alt="" /> */}
                 <span className="status online"></span>
               </span>
-              <span onClick={logOut}>Log Out</span>
+              <span>
+                {!localStorage.getItem("loged")
+                  ? " "
+                  : localStorage.getItem("loged")}
+              </span>
+              <i
+                style={{ color: "red" }}
+                onClick={logOut}
+                className="fa-solid fa-power-off"
+              ></i>
             </a>
             {/* <div className="dropdown-menu">
               <a className="dropdown-item" href="profile.html">

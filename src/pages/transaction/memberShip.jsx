@@ -19,7 +19,7 @@ const MemberShip = () => {
   const [allData, setAllData] = useState([]);
   const [updateId, setUpdateId] = useState("");
   const [status, setStatus] = useState(false);
-
+  let ismount = false;
   function toastfy(message) {
     toast(message);
   }
@@ -53,12 +53,13 @@ const MemberShip = () => {
     setResponseMessage(response.statusText);
     toastfy(response.data.message);
     closeModal();
-    console.log(response);
   };
   const getData = async () => {
     try {
       const allData = await axios.get(`${url.memberShip}`);
-      setAllData(allData.data.data);
+      if (!ismount) {
+        setAllData(allData.data.data);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -78,6 +79,7 @@ const MemberShip = () => {
     try {
       const response = await axios.get(`${url.client}`);
       setAllClient(response.data.data);
+      console.log(response.data.data);
     } catch (error) {
       console.log(error);
     }
@@ -102,20 +104,25 @@ const MemberShip = () => {
   const handleChange = (data) => {
     setActivity(data);
   };
-  const findClient = async (id) => {
-    try {
-      const response = await axios.get(`${url.client}/${id}`);
-      const clientName = response.data.data;
-      return "" + clientName.name + "";
-    } catch (error) {
-      console.log(error);
-    }
+  const findClient = (id) => {
+    let clientName;
+    const response = axios.get(`${url.client}/${id}`);
+    response
+      .then(function (data) {
+        clientName = data.data.data.name;
+      })
+      .catch(function (e) {
+        console.log(e);
+      });
   };
+  console.log(findClient);
   useEffect(() => {
     getData();
     getClients();
     getActivities();
-    console.log("running");
+    return () => {
+      ismount = true;
+    };
   }, [responseMessage]);
   const customCatStyles = {
     content: {
@@ -209,9 +216,11 @@ const MemberShip = () => {
                           <tr>
                             <td className="items-text">{data.activity.name}</td>
                             <td className="items-text">
-                              {/* {findClient(data.client)
-                                .then((cl) => <span>{cl}</span>)
-                                .catch((error) => console.log(error))} */}
+                              {findClient !== null ? (
+                                findClient(data.client)
+                              ) : (
+                                <span></span>
+                              )}
                             </td>
                             <td className="items-text">{data.startDate}</td>
                             <td className="items-text">{data.endDate}</td>

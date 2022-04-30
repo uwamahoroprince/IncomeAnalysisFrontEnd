@@ -18,7 +18,9 @@ const Login = () => {
       });
       window.location.reload(false);
       localStorage.setItem("token", response.data.token);
-      console.log(response.data);
+      localStorage.setItem("role", response.data.role);
+      localStorage.setItem("logedUser", response.data.name);
+      console.log(response.data.userName);
     } catch (error) {
       console.log(error);
     }
