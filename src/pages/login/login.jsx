@@ -30,8 +30,8 @@ const Login = () => {
       <div className="login-page bg-light">
         <div className="container">
           <div className="row">
-            <div className="col-lg-10 offset-lg-1">
-              <div className="bg-white shadow rounded">
+            <div className="col-lg-10 offset-lg-1 ">
+              <div className="bg-white shadow rounded ">
                 <div className="row">
                   <div className="col-md-7 pe-0">
                     <div className="form-left h-100 py-5 px-5">

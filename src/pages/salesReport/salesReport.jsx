@@ -60,10 +60,12 @@ const SalesReport = () => {
   const isfound = true;
   const pieData = [];
 
-  const [barData, setBarData] = useState();
+  const [barData, setBarData] = useState([]);
   const [amountFromActivity, setAmountFromActivity] = useState(0);
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
+  const [month, setMonth] = useState();
+  const [activityPermonth, setActivityPerMonth] = useState([]);
   const [total, setTotal] = useState(0);
   let valuePairState = [];
   const getAllSubscriptions = async () => {
@@ -74,9 +76,7 @@ const SalesReport = () => {
 
       for (const key in data) {
         for (const innerKey in data[key].activity) {
-          console.log();
           let id = data[key].activity[innerKey];
-          console.log(`${url.activity}/${id}`);
           let response = await axios.get(`${url.activity}/${id}`);
           const amount = response.data.data.amountPermonth;
           addedAmount = addedAmount + amount;
@@ -166,6 +166,66 @@ const SalesReport = () => {
       value: totalExpense,
     }
   );
+  const activityAnalyisis = async (month) => {
+    try {
+      let formattedSubscription = [];
+      const response = await axios.get(`${url.memberShip}`);
+      const data = response.data.data;
+      //FINDING SUBSCRIPTION BY GIVEN MONTH
+      for (const key in data) {
+        let date = new Date(data[key].createdAt);
+        if (date.getMonth() + 1 === month) {
+          for (const innerKey in data[key].activity) {
+            let id = data[key].activity[innerKey];
+            let actResponse = await axios.get(`${url.activity}/${id}`);
+            let name = actResponse.data.data.name;
+            if (actResponse != null) {
+              let index = formattedSubscription.findIndex(
+                (el) => el.Activity === name
+              );
+              if (index != -1) {
+                formattedSubscription[index] = {
+                  Activity: name,
+                  Amount:
+                    formattedSubscription[index].Amount +
+                    actResponse.data.data.amountPermonth,
+                };
+              } else {
+                formattedSubscription.push({
+                  Activity: name,
+                  Amount: actResponse.data.data.amountPermonth,
+                });
+              }
+            }
+          }
+        }
+      }
+      setActivityPerMonth(formattedSubscription);
+      console.log(formattedSubscription);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  function handleMonthChange(month) {
+    monthWorldConverter(parseInt(month));
+    activityAnalyisis(parseInt(month));
+    openActivityModal();
+  }
+  function handleActivityTable(month) {
+    monthWorldConverter(parseInt(month));
+    activityAnalyisis(parseInt(month));
+    openModalTable();
+  }
+  function monthWorldConverter(month) {
+    let temoMonth;
+    for (let i = 0; i <= allMonths.length; i++) {
+      if (i + 1 === month) {
+        temoMonth = allMonths[i];
+        break;
+      }
+    }
+    setMonth(temoMonth);
+  }
   const customCatStyles = {
     content: {
       top: "10%",
@@ -183,9 +243,20 @@ const SalesReport = () => {
     },
   };
   const [modalIsOpen, setIsOpen] = React.useState(false);
-
+  const [activityMoal, setIsActivityModal] = React.useState(false);
+  const [activityMoalTable, setIsactivityMoalTable] = React.useState(false);
+  const [ModalTable, setIsModalTable] = React.useState(false);
   function openModal() {
     setIsOpen(true);
+  }
+  function openActivityModal() {
+    setIsActivityModal(true);
+  }
+  function openActivityModalTable() {
+    setIsactivityMoalTable(true);
+  }
+  function openModalTable() {
+    setIsModalTable(true);
   }
 
   function afterOpenModal() {
@@ -197,11 +268,21 @@ const SalesReport = () => {
   function closeModal() {
     setIsOpen(false);
   }
+  function closeActivityModal() {
+    setIsActivityModal(false);
+  }
+  function closeActivityModalTable() {
+    setIsactivityMoalTable(false);
+  }
+
+  function closeModalTable() {
+    setIsModalTable(false);
+  }
+  console.log(month);
   useEffect(() => {
     getAllTransactions();
     getAllSubscriptions();
-    // getTotalAmountFromSubscription();
-
+    console.log("running");
     return () => {
       isfound = false;
     };
@@ -240,11 +321,13 @@ const SalesReport = () => {
               style={{ marginLeft: "25px" }}
               className="fa-solid fa-table "
             ></i>
-            <span className="btn">Table</span>
+            <span className="btn" onClick={openActivityModalTable}>
+              Table
+            </span>
           </ol>
         </nav>
 
-        {/* <nav aria-label="breadcrumb ">
+        <nav aria-label="breadcrumb ">
           <ol
             className="breadcrumb bg-2"
             className="breadcrumb bg-2"
@@ -258,7 +341,7 @@ const SalesReport = () => {
               className="breadcrumb-item active h6 text-black"
               aria-current="page"
             >
-              Sales By Item
+              Sales By Activity Over Time
             </li>
             <i
               style={{ marginLeft: "25px" }}
@@ -268,17 +351,32 @@ const SalesReport = () => {
               className="btn "
               data-bs-toggle="modal"
               data-bs-target="#add_items"
-              onClick={openModal}
             >
               Chart
             </a>
+            <select onChange={(e) => handleMonthChange(e.target.value)}>
+              <option value="" selected disabled>
+                Select Month
+              </option>
+              {allMonths.map((data, index) => (
+                <option value={index + 1}>{data}</option>
+              ))}
+            </select>
             <i
               style={{ marginLeft: "25px" }}
               className="fa-solid fa-table "
             ></i>
             <span className="cursor-pointer btn">Table</span>
+            <select onChange={(e) => handleActivityTable(e.target.value)}>
+              <option value="" selected disabled>
+                Select Month
+              </option>
+              {allMonths.map((data, index) => (
+                <option value={index + 1}>{data}</option>
+              ))}
+            </select>
           </ol>
-        </nav> */}
+        </nav>
       </div>
       <Modal
         isOpen={modalIsOpen}
@@ -322,6 +420,169 @@ const SalesReport = () => {
                       background={{ fill: "#eee" }}
                     />
                   </BarChart>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </Modal>
+      {/* ACTIVITY PER TIME  */}
+      <Modal
+        isOpen={activityMoal}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeActivityModal}
+        style={customCatStyles}
+        contentLabel="Example Modal"
+      >
+        <form
+          className="modal-dialog modal-dialog-centered modal-lg"
+          novalidate=""
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="form-header text-start mb-0">
+                <h4 className="mb-0">Sales By Activity in {month}</h4>
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="bank-inner-details">
+                <div className="row">
+                  <BarChart
+                    width={600}
+                    height={300}
+                    data={activityPermonth}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 5,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="Activity" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="Amount"
+                      fill="#8884d8"
+                      background={{ fill: "#eee" }}
+                    />
+                  </BarChart>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </Modal>
+      <Modal
+        isOpen={activityMoalTable}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeActivityModalTable}
+        style={customCatStyles}
+        contentLabel="Example Modal"
+      >
+        <form
+          className="modal-dialog modal-dialog-centered modal-lg"
+          novalidate=""
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="form-header text-start mb-0">
+                <h4 className="mb-0">Sale Over Time</h4>
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="bank-inner-details">
+                <div className="row">
+                  <div className="col-sm-11">
+                    <div className="card card-table">
+                      <div className="card-body">
+                        <div className="table-responsive">
+                          <table className="table table-stripped table-hover datatable">
+                            <thead className="thead-light">
+                              <tr>
+                                <th>No</th>
+                                <th>Month</th>
+                                <th>Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {barData.length != 0 ? (
+                                barData.map((data, index) => (
+                                  <tr>
+                                    <td>{index + 1}</td>
+                                    <td>{data.name}</td>
+                                    <td>{data.Sales}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <></>
+                              )}
+                              <tr></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </Modal>
+      <Modal
+        isOpen={ModalTable}
+        onAfterOpen={afterOpenModal}
+        onRequestClose={closeModalTable}
+        style={customCatStyles}
+        contentLabel="Example Modal"
+      >
+        <form
+          className="modal-dialog modal-dialog-centered modal-lg"
+          novalidate=""
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="form-header text-start mb-0">
+                <h4 className="mb-0">Sale By Activity in {month}</h4>
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="bank-inner-details">
+                <div className="row">
+                  <div className="col-sm-11">
+                    <div className="card card-table">
+                      <div className="card-body">
+                        <div className="table-responsive">
+                          <table className="table table-stripped table-hover datatable">
+                            <thead className="thead-light">
+                              <tr>
+                                <th>No</th>
+                                <th>Activity Name</th>
+                                <th>Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {activityPermonth.length != 0 ? (
+                                activityPermonth.map((data, index) => (
+                                  <tr>
+                                    <td>{index + 1}</td>
+                                    <td>{data.Activity}</td>
+                                    <td>{data.Amount}</td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <></>
+                              )}
+                              <tr></tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

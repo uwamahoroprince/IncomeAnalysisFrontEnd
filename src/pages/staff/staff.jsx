@@ -246,6 +246,9 @@ const Staff = () => {
                           onChange={(role) => setRole(role.target.value)}
                           className="form-select form-control"
                         >
+                          <option value="" selected disabled>
+                            Select Role
+                          </option>
                           <option value="admin">Admin</option>
                           <option value="receptionist">Receptionist</option>
                           <option value="manager">Manager</option>
