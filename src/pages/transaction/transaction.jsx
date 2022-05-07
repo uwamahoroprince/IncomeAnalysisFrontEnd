@@ -70,21 +70,16 @@ const Transaction = () => {
       console.log(error);
     }
   };
-  const getSingleClient = async (clientId) => {
-    let response = "";
+  function getSingleClient(clientId) {
     let name;
-    try {
-      response = await axios.get(`${url.client}/${clientId}`);
-      const data = response.data.data;
-      name = data.name;
-    } catch (error) {
-      toastify(response.data.message);
-      console.log(error);
+    for (const key in allClients) {
+      if (allClients[key]._id === clientId) {
+        name = allClients[key].name;
+        break;
+      }
     }
-    return {
-      name: name,
-    };
-  };
+    return name;
+  }
   const deleteData = async (id) => {
     let response;
     try {
@@ -100,7 +95,8 @@ const Transaction = () => {
   useEffect(() => {
     getData();
     getClients();
-  }, [responseMessage]);
+    console.log("running");
+  }, []);
   const customCatStyles = {
     content: {
       top: "10%",
@@ -191,7 +187,7 @@ const Transaction = () => {
                           <tr>
                             <td>{data.type}</td>
                             <td>{data.amount}</td>
-                            <td>{getSingleClient(data.client).name}</td>
+                            <td>{getSingleClient(data.client)}</td>
                             <td>
                               <span
                                 onClick={() => {

@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal/lib/components/Modal";
 import { url } from "../../constants/url";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Accounts = () => {
@@ -14,58 +14,46 @@ const Accounts = () => {
   const [allAccounts, setAllAccounts] = useState([]);
   const [updateId, setUpdateId] = useState("");
   const [status, setStatus] = useState(false);
+
+  function toastfy(message) {
+    toast(message);
+  }
   const handleSubmit = async (event) => {
     let response;
     event.preventDefault();
 
     try {
       if (!status) {
-        response = await fetch(`${url.acoount}`, {
-          method: "POST",
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name,
-            currency: "Rwf",
-            amount: amount,
-            description: description,
-          }),
+        response = await axios.post(`${url.acoount}`, {
+          name: name,
+          currency: currency,
+          amount: amount,
+          description: description,
         });
+        toastfy("Account Created");
+        setResponseMessage(Math.floor(Math.random() * 100));
       } else {
-        response = await fetch(`${url.acoount}/${updateId}`, {
-          method: "PUT",
-          mode: "cors",
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name,
-            currency: "Rwf",
-            amount: amount,
-            description: description,
-          }),
+        response = await axios.put(`${url.acoount}/${updateId}`, {
+          name: name,
+          currency: "Rwf",
+          amount: amount,
+          description: description,
         });
+        toastfy("Account Updated");
+        setResponseMessage(Math.floor(Math.random() * 100));
       }
       setStatus(false);
     } catch (error) {
       console.log(error);
+      toastfy("An Error Accrued");
     }
-    setName("");
-    setAmount("");
-    setCurrency("");
-    setDescription("");
+
     setResponseMessage(response.statusText);
-    toast(responseMessage);
     closeModal();
   };
   const getData = async () => {
     try {
       const accounts = await axios.get(`${url.acoount}`);
-      console.log(accounts.data.data);
       setAllAccounts(accounts.data.data);
     } catch (error) {
       console.log(error);
@@ -75,6 +63,30 @@ const Accounts = () => {
     try {
       const account = await axios.delete(`${url.acoount}/${id}`);
       setResponseMessage(account.data.message);
+      toastfy("Account Deleted");
+      setResponseMessage(Math.floor(Math.random() * 100));
+    } catch (error) {
+      console.log(error);
+      toastfy(
+        "other Entities has dependency to this account, it can't be Deleted"
+      );
+    }
+  };
+  function dateFormatter(date) {
+    const year = new Date(date).getFullYear();
+    const month = new Date(date).getMonth() + 1;
+    const day = new Date(date).getDay() + 1;
+    return `${year}-${month}-${day}`;
+  }
+  const getSingleAccount = async (accountId) => {
+    try {
+      const response = await axios.get(`${url.acoount}/${accountId}`);
+      const data = response.data.data;
+      console.log(data);
+      setName(data.name);
+      setAmount(data.amount);
+      setCurrency(data.currency);
+      setDescription(data.description);
     } catch (error) {
       console.log(error);
     }
@@ -82,6 +94,7 @@ const Accounts = () => {
 
   useEffect(() => {
     getData();
+    console.log("running");
   }, [responseMessage]);
   const customCatStyles = {
     content: {
@@ -113,6 +126,11 @@ const Accounts = () => {
 
   function closeModal() {
     setIsOpen(false);
+    setName("");
+    setAmount("");
+    setCurrency("");
+    setDescription("");
+    setStatus(null);
   }
   return (
     <>
@@ -131,25 +149,19 @@ const Accounts = () => {
           </div>
         </div>
 
-        <div className="col-sm-2 pull-right card invoices-tabs-card">
-          <div className="card-body card-body pt-0 pb-0">
-            <div className="invoices-main-tabs border-0 pb-0">
-              <div className="row align-items-center">
-                <div className="col-lg-12 col-md-12">
-                  <div className="invoices-settings-btn invoices-settings-btn-one">
-                    <a
-                      onClick={openModal}
-                      href="#"
-                      className="btn"
-                      data-bs-toggle="modal"
-                      data-bs-target="#add_items"
-                    >
-                      <i data-feather="plus-circle"></i>Account
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div
+          className="row m-4"
+          style={{
+            display: "flex",
+            alignItems: "right",
+            justifyContent: "right",
+          }}
+        >
+          <div className="col-sm-2 bg-primary m-2">
+            <a onClick={openModal} href="#">
+              <i className="fas fa-plus m-2 btn btn-primary"></i>
+              <span className="text-light">Add New</span>
+            </a>
           </div>
         </div>
 
@@ -176,14 +188,17 @@ const Accounts = () => {
                             <td>{data.name}</td>
                             <td className="text-primary">{data.amount}</td>
                             <td>{data.currency}</td>
-                            <td className="items-text">{data.createdAt}</td>
+                            <td className="items-text">
+                              {dateFormatter(data.createdAt)}
+                            </td>
                             <td>Active</td>
                             <td>
                               <span
                                 onClick={() => {
                                   openModal();
-                                  status(true);
+                                  setStatus(true);
                                   setUpdateId(data._id);
+                                  getSingleAccount(data._id);
                                 }}
                                 className="btn btn-sm btn-white text-success me-2"
                               >
@@ -255,9 +270,9 @@ const Accounts = () => {
                           }
                           className="form-select form-control"
                         >
-                          <option value={currency}>Rwf</option>
-                          <option value={currency}>$</option>
-                          <option value={currency}>€</option>
+                          <option value="Rwf">Rwf</option>
+                          <option value="$">$</option>
+                          <option value="€">€</option>
                         </select>
                       </div>
                     </div>

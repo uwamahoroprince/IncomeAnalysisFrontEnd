@@ -6,9 +6,10 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 const BudgetPlan = () => {
   const [form, setForm] = useState([]);
-  const [status, setStatus] = useState("");
   const [endDate, setEndDate] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [allAccount, setAllAcount] = useState([]);
   const [account, setAcount] = useState({});
   const [expectedIncome, setExpectedIncome] = useState("");
@@ -51,6 +52,8 @@ const BudgetPlan = () => {
         endDate: endDate,
         startDate: startDate,
         account: account._id,
+        name: name,
+        description: description,
         expectedIncome: expectedIncome,
       });
       const message = response.data.data.message;
@@ -85,6 +88,34 @@ const BudgetPlan = () => {
           <fieldset className="border text-center border-dark">
             <legend className="h6">Budget Period</legend>
             <div className="row align-items-center justify-content-center">
+              <div className="col-md-5 col-sm-5">
+                <div className="form-group">
+                  <label>Budget Name</label>
+                  <input
+                    placeholder="Budget Name"
+                    required
+                    value={name}
+                    onChange={(name) => setName(name.target.value)}
+                    type="text"
+                    className="form-control text-center"
+                  />
+                </div>
+              </div>
+              <div className="col-md-5 col-sm-5">
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    placeholder="More About Budget"
+                    required
+                    value={description}
+                    onChange={(description) =>
+                      setDescription(description.target.value)
+                    }
+                    type="text"
+                    className="form-control text-center"
+                  />
+                </div>
+              </div>
               <div className="col-md-5 col-sm-5">
                 <div className="form-group">
                   <label>Start Date</label>

@@ -19,6 +19,9 @@ const MemberShip = () => {
   const [allData, setAllData] = useState([]);
   const [updateId, setUpdateId] = useState("");
   const [status, setStatus] = useState(false);
+  const [subsActivities, setSubsActivities] = useState([]);
+  const [renderActivities, setRenderActivities] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState("");
   let ismount = false;
   function toastfy(message) {
     toast(message);
@@ -79,16 +82,43 @@ const MemberShip = () => {
     try {
       const response = await axios.get(`${url.client}`);
       setAllClient(response.data.data);
-      console.log(response.data.data);
     } catch (error) {
       console.log(error);
     }
   };
+  function findSingleClient(clientId) {
+    let name;
+    for (const key in allClient) {
+      if (allClient[key]._id === clientId) {
+        name = allClient[key].name;
+        break;
+      }
+    }
+    return name;
+  }
+  function findSubcribedActivities(activities) {
+    let newactivities = [];
+    for (const key in activities.activity) {
+      for (const innerKey in allActivity) {
+        if (renderActivities[innerKey]._id === activities.activity[key]) {
+          newactivities.push(renderActivities[innerKey]);
+        }
+      }
+    }
+    setSubsActivities(newactivities);
+  }
+  function dateFormatter(date) {
+    const year = new Date(date).getFullYear();
+    const month = new Date(date).getMonth() + 1;
+    const day = new Date(date).getDay() + 1;
+    return `${year}-${month}-${day}`;
+  }
   const option = [];
   const getActivities = async () => {
     try {
       const response = await axios.get(`${url.activity}`);
       setAllActivity(response.data.data);
+      setRenderActivities(response.data.data);
       const results = response.data.data;
       for (const key in results) {
         option.push({
@@ -104,18 +134,7 @@ const MemberShip = () => {
   const handleChange = (data) => {
     setActivity(data);
   };
-  const findClient = (id) => {
-    let clientName;
-    const response = axios.get(`${url.client}/${id}`);
-    response
-      .then(function (data) {
-        clientName = data.data.data.name;
-      })
-      .catch(function (e) {
-        console.log(e);
-      });
-  };
-  console.log(findClient);
+
   useEffect(() => {
     getData();
     getClients();
@@ -127,8 +146,24 @@ const MemberShip = () => {
   const customCatStyles = {
     content: {
       top: "10%",
+      left: "20%",
+      right: "40%",
+      background: "#fff",
+      opacity: 1,
+      overflow: "auto",
+      WebkitOverflowScrolling: "touch",
+      borderRadius: "2%",
+      outline: "none",
+    },
+    overlay: {
+      backgroundColor: "rgba(238, 228, 248, 0.80)",
+    },
+  };
+  const ActivitycustomCatStyles = {
+    content: {
+      top: "10%",
       left: "30%",
-      right: "20%",
+      right: "40%",
       background: "#fff",
       opacity: 1,
       overflow: "auto",
@@ -142,9 +177,13 @@ const MemberShip = () => {
   };
   let subtitle;
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [isActivityModalOpen, setIsActivityModalOpen] = React.useState(false);
 
   function openModal() {
     setIsOpen(true);
+  }
+  function openActivityModal() {
+    setIsActivityModalOpen(true);
   }
 
   function afterOpenModal() {
@@ -155,6 +194,10 @@ const MemberShip = () => {
   function closeModal() {
     setIsOpen(false);
   }
+  function closeActivityModal() {
+    setIsActivityModalOpen(false);
+  }
+  const handleOnlinePayMent = () => {};
   return (
     <>
       <div className="content container-fluid">
@@ -202,11 +245,11 @@ const MemberShip = () => {
                   <table className="table table-stripped table-hover datatable">
                     <thead className="thead-light">
                       <tr>
-                        <th>Activity</th>
                         <th>Client</th>
                         <th>Start Date</th>
                         <th>End Date At</th>
                         <th>Status</th>
+                        <th>Activity</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -214,17 +257,29 @@ const MemberShip = () => {
                       {allData.length !== 0 ? (
                         allData.map((data, index) => (
                           <tr>
-                            <td className="items-text">{data.activity.name}</td>
                             <td className="items-text">
-                              {findClient !== null ? (
-                                findClient(data.client)
-                              ) : (
-                                <span></span>
-                              )}
+                              {findSingleClient(data.client)}
                             </td>
-                            <td className="items-text">{data.startDate}</td>
-                            <td className="items-text">{data.endDate}</td>
-                            <td className="items-text">{data.status}</td>
+                            <td className="items-text">
+                              {dateFormatter(data.startDate)}
+                            </td>
+                            <td className="items-text">
+                              {dateFormatter(data.endDate)}
+                            </td>
+                            <td className="items-text text-primary">
+                              {data.status}
+                            </td>
+                            <td>
+                              <div
+                                onClick={() => {
+                                  openActivityModal();
+                                  findSubcribedActivities(data);
+                                }}
+                                className="btn btn-secondary"
+                              >
+                                View
+                              </div>
+                            </td>
                             <td>
                               <span
                                 onClick={() => {
@@ -350,6 +405,34 @@ const MemberShip = () => {
                         ></textarea>
                       </div>
                     </div>
+                    <div className="row">
+                      <div className="col-sm-6">
+                        <select
+                          onChange={(paymentMethod) =>
+                            setPaymentMethod(paymentMethod.target.value)
+                          }
+                          className="form-select form-control"
+                        >
+                          <option value="" selected disabled>
+                            Select Payment Method
+                          </option>
+                          <option value="Cash">Cash</option>
+                          <option value="Mobile Money">Mobile Money</option>
+                        </select>
+                      </div>
+
+                      {paymentMethod === "Mobile Money" ? (
+                        <div className="col-sm-6">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Mobile Money Number"
+                          />
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -362,13 +445,69 @@ const MemberShip = () => {
                     Cancel
                   </a>
                 </div>
-                <div className=" col-sm-2 bank-details-btn">
-                  <button
-                    onClick={handleSubmit}
-                    className="btn btn btn-success bank-save-btn"
-                  >
-                    Save
-                  </button>
+                {paymentMethod === "Cash" ? (
+                  <div className=" col-sm-2 bank-details-btn">
+                    <button
+                      onClick={handleSubmit}
+                      className="btn btn btn-success bank-save-btn"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                ) : (
+                  <></>
+                )}
+                {paymentMethod === "Mobile Money" ? (
+                  <div className=" col-sm-2 bank-details-btn">
+                    <button
+                      onClick={handleOnlinePayMent}
+                      className="btn btn btn-success bank-save-btn"
+                    >
+                      Procceed
+                    </button>
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
+            </div>
+          </form>
+        </Modal>
+        <Modal
+          isOpen={isActivityModalOpen}
+          onAfterOpen={afterOpenModal}
+          onRequestClose={closeActivityModal}
+          style={ActivitycustomCatStyles}
+          contentLabel="Example Modal"
+        >
+          <form
+            className="modal-dialog modal-dialog-centered modal-lg"
+            novalidate=""
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <div className="form-header text-start mb-0">
+                  <h4 className="mb-0">Subscribed Activities</h4>
+                </div>
+              </div>
+              <div className="modal-body">
+                <div className="bank-inner-details">
+                  <div className="row d-flex align-items-center justify-content-center">
+                    <div className="col-sm-6">
+                      {subsActivities.length != 0 ? (
+                        subsActivities.map((data) => (
+                          <>
+                            <div className="badge bg-light text-dark ">
+                              <div className="h6">{data.name}</div>
+                            </div>
+                            <br />
+                          </>
+                        ))
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

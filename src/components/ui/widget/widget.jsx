@@ -4,10 +4,10 @@ const Widget = (props) => {
   const progress = props.number + 10;
   return (
     <>
-      <div className="col-xl-2 col-sm-6 col-12">
-        <div className="card">
+      <div className="col-xl-2 col-sm-6 col-12 ">
+        <div className="card  border border-secondry">
           <div className="card-body">
-            <div className="dash-widget-header">
+            <div className="dash-widget-header ">
               <span className={props.iconBackground}>
                 <i className={props.icon}></i>
               </span>

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { url } from "../../constants/url";
 import Modal from "react-modal/lib/components/Modal";
-import { Link } from "react-router-dom";
 
 const BudgetView = () => {
   const [budget, setBudget] = useState([]);
   const [singleBudget, setSingleBudget] = useState([]);
+  const [description, setDescription] = useState("");
+  const [total, setTotal] = useState([]);
   const getData = async () => {
     try {
       const response = await axios.get(`${url.budgetPlan}`);
@@ -20,7 +21,15 @@ const BudgetView = () => {
     try {
       const response = await axios.get(`${url.budgetPlan}/${budgetId}`);
       const details = response.data.data.expense;
+      const foundDescription = response.data.data.description;
+      let singleAmount = 0;
       setSingleBudget(details);
+      setDescription(foundDescription);
+      for (const key in details) {
+        singleAmount =
+          parseFloat(singleAmount) + parseFloat(details[key].ammount);
+      }
+      setTotal(singleAmount);
       console.log(details);
     } catch (error) {
       console.log(error);
@@ -33,6 +42,7 @@ const BudgetView = () => {
     const fullDate = `${day}-${month}-${year}`;
     return fullDate;
   };
+
   useEffect(() => {
     getData();
     console.log("running");
@@ -78,20 +88,24 @@ const BudgetView = () => {
                 <table className="table table-stripped table-hover datatable">
                   <thead className="thead-light">
                     <tr>
+                      <th>Name</th>
                       <th>Start Date</th>
                       <th>End Date</th>
                       <th>Status</th>
-                      <th>Created At</th>
-                      <th>Expense</th>
+
+                      <th>Expected Income</th>
+                      <th>More</th>
                     </tr>
                   </thead>
                   <tbody>
                     {budget.length !== 0 ? (
                       budget.map((data, index) => (
                         <tr>
+                          <td>{data.name}</td>
                           <td>{dateConverter(data.startDate)}</td>
                           <td>{dateConverter(data.endDate)}</td>
                           <td className="text-primary">Active</td>
+
                           <td>{data.expectedIncome}</td>
                           <td>
                             <div
@@ -151,14 +165,39 @@ const BudgetView = () => {
                                 <tbody>
                                   {singleBudget.length !== 0 ? (
                                     singleBudget.map((data, index) => (
-                                      <tr>
-                                        <td>{index + 1}</td>
-                                        <td>{data.transaction}</td>
-                                        <td>{data.ammount}</td>
-                                      </tr>
+                                      <>
+                                        <tr>
+                                          <td>{index + 1}</td>
+                                          <td>{data.transaction}</td>
+                                          <td>{data.ammount}</td>
+                                        </tr>
+                                      </>
                                     ))
                                   ) : (
                                     <span>not details found</span>
+                                  )}
+                                  <>
+                                    <tr>
+                                      <td colspan="2">
+                                        <div className="badge bg-success ">
+                                          Total :{" "}
+                                        </div>
+                                        &nbsp; <span>{total}</span>
+                                      </td>
+                                    </tr>
+                                  </>
+                                  {description ? (
+                                    <tr>
+                                      <td colspan="2">
+                                        <div className="badge bg-light text-success">
+                                          Description :
+                                        </div>
+                                        <br />
+                                        <span>{description}</span>
+                                      </td>
+                                    </tr>
+                                  ) : (
+                                    <></>
                                   )}
                                 </tbody>
                               </table>

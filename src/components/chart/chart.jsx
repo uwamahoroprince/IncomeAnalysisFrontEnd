@@ -178,7 +178,7 @@ const Chart = () => {
     <>
       <div className="row m-3">
         <div className="col-xl-7 d-flex">
-          <div className="card flex-fill">
+          <div className="card flex-fill  border border-secondry">
             <div className="card-header">
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="card-title">Transaction Analytics</h5>
@@ -238,7 +238,7 @@ const Chart = () => {
           </div>
         </div>
         <div className="col-xl-5 d-flex">
-          <div className="card flex-fill">
+          <div className="card flex-fill  border border-secondry">
             <div className="card-header">
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="card-title">Pie Transaction Analytics</h5>

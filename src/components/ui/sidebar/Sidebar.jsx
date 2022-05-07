@@ -6,14 +6,14 @@ const SideBar = () => {
   console.log(role);
   return (
     <>
-      <div className="sidebar" id="sidebar">
-        <div className="sidebar-inner slimscroll">
+      <div className="sidebar border border-secondry" id="sidebar">
+        <div className="sidebar-inner slimscroll ">
           <div id="sidebar-menu" className="sidebar-menu">
             <ul>
-              <li className="menu-title">
+              <li className="menu-title ">
                 <span>Main</span>
               </li>
-              <li className="active">
+              <li className="active ">
                 <Link to="/">
                   <i className="fa-solid fa-gauge" data-feather="home"></i>{" "}
                   <span>Dashboard</span>

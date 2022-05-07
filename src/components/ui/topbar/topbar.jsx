@@ -15,7 +15,7 @@ const TopBar = () => {
 
   return (
     <>
-      <div className="header">
+      <div className="header border border-secondry">
         <div className="header-left">
           <a href="#" className="logo">
             <img
