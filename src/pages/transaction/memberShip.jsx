@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Select from "react-select";
 import "react-toastify/dist/ReactToastify.css";
+import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3";
 toast.configure();
 const MemberShip = () => {
   const [activity, setActivity] = useState([]);
@@ -22,6 +23,11 @@ const MemberShip = () => {
   const [subsActivities, setSubsActivities] = useState([]);
   const [renderActivities, setRenderActivities] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const names = localStorage.getItem("logedUser");
+  const logedemail = localStorage.getItem("logedEmail");
+
+  const [totalCost, setTotalConst] = useState(0);
   let ismount = false;
   function toastfy(message) {
     toast(message);
@@ -38,6 +44,7 @@ const MemberShip = () => {
           startDate: startDate,
           endDate: endDate,
         });
+        setResponseMessage(Math.floor(Math.random() * 10000));
       } else {
         response = await axios.put(`${url.memberShip}/${updateId}`, {
           activity: activity.value,
@@ -45,6 +52,7 @@ const MemberShip = () => {
           startDate: startDate,
           endDate: endDate,
         });
+        setResponseMessage(Math.floor(Math.random() * 10000));
       }
       setStatus(false);
     } catch (error) {
@@ -72,6 +80,7 @@ const MemberShip = () => {
     let allData;
     try {
       allData = await axios.delete(`${url.memberShip}/${id}`);
+      setResponseMessage(Math.floor(Math.random() * 10000));
       setResponseMessage(allData.data.message);
     } catch (error) {
       console.log(error);
@@ -134,7 +143,30 @@ const MemberShip = () => {
   const handleChange = (data) => {
     setActivity(data);
   };
-
+  const getPayData = (data) => {
+    localStorage.setItem("clientEmail", data.email);
+    localStorage.setItem("clientNames", data.name);
+    localStorage.setItem("clientPhone", data.phone);
+  };
+  console.log(localStorage.getItem("clientEmail"));
+  const config = {
+    public_key: "FLWPUBK_TEST-8f5bd8f2a9e558add35e1a039bb91622-X",
+    tx_ref: Date.now(),
+    amount: 100,
+    currency: "RWF",
+    payment_options: "card,mobilemoney,ussd",
+    customer: {
+      email: `${logedemail}`,
+      phonenumber: `${localStorage.getItem("clientPhone")}`,
+      name: `${localStorage.getItem("clientNames")}`,
+    },
+    customizations: {
+      title: "Nyarutarama Sport Trust Club",
+      description: "Payment for Subscription",
+      logo: "",
+    },
+  };
+  const handleFlutterPayment = useFlutterwave(config);
   useEffect(() => {
     getData();
     getClients();
@@ -197,7 +229,6 @@ const MemberShip = () => {
   function closeActivityModal() {
     setIsActivityModalOpen(false);
   }
-  const handleOnlinePayMent = () => {};
   return (
     <>
       <div className="content container-fluid">
@@ -357,7 +388,11 @@ const MemberShip = () => {
                           <option>Select Client</option>
                           {allClient.length != 0 ? (
                             allClient.map((data, index) => (
-                              <option key={index} value={data._id}>
+                              <option
+                                onClick={() => getPayData(data)}
+                                key={index}
+                                value={data._id}
+                              >
                                 {data.name}
                               </option>
                             ))
@@ -420,18 +455,6 @@ const MemberShip = () => {
                           <option value="Mobile Money">Mobile Money</option>
                         </select>
                       </div>
-
-                      {paymentMethod === "Mobile Money" ? (
-                        <div className="col-sm-6">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Enter Mobile Money Number"
-                          />
-                        </div>
-                      ) : (
-                        <></>
-                      )}
                     </div>
                   </div>
                 </div>
@@ -460,10 +483,42 @@ const MemberShip = () => {
                 {paymentMethod === "Mobile Money" ? (
                   <div className=" col-sm-2 bank-details-btn">
                     <button
-                      onClick={handleOnlinePayMent}
                       className="btn btn btn-success bank-save-btn"
+                      onClick={() => {
+                        handleFlutterPayment({
+                          callback: (response) => {
+                            console.log(response);
+                            console.log(response.status);
+                            if (response.status === "successful") {
+                              axios
+                                .post(`${url.memberShip}`, {
+                                  activity: activity,
+                                  client: client,
+                                  startDate: startDate,
+                                  endDate: endDate,
+                                })
+                                .then((res) =>
+                                  toastfy("Subscription SuccessFully Paid")
+                                )
+                                .catch((err) => console.log(err));
+                              closeModal();
+                              setResponseMessage(
+                                Math.floor(Math.random() * 10000)
+                              );
+                            }
+
+                            closePaymentModal(); // this will close the modal programmatically
+                          },
+                          onClose: () => {
+                            closeModal();
+                            setResponseMessage(
+                              Math.floor(Math.random() * 10000)
+                            );
+                          },
+                        });
+                      }}
                     >
-                      Procceed
+                      Proceed
                     </button>
                   </div>
                 ) : (
