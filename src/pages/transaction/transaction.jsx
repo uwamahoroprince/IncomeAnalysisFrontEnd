@@ -12,6 +12,7 @@ const Transaction = () => {
   const [allClients, setAllClients] = useState([]);
   const [allTransactions, setAllTransactions] = useState([]);
   const [updateId, setUpdateId] = useState("");
+  const [description, setDescription] = useState("");
   const [status, setStatus] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
   const [singleClient, setSingleClient] = useState("");
@@ -27,16 +28,18 @@ const Transaction = () => {
     try {
       if (!status) {
         response = await axios.post(`${url.transaction}`, {
-          type: type,
+          type: "expense",
           amount: amount,
           client: client,
+          description: description,
         });
         toastify(response.data.message);
       } else {
         response = await axios.put(`${url.transaction}/${updateId}`, {
-          type: type,
+          type: "expense",
           amount: amount,
           client: client,
+          description: description,
         });
         toastify(response.data.message);
       }
@@ -47,7 +50,8 @@ const Transaction = () => {
     setType("");
     setClient("");
     setAmount("");
-    setResponseMessage(response.statusText);
+    setResponseMessage(Math.floor(Math.random() * 10000));
+    setStatus(false);
     closeModal();
   };
   const getData = async () => {
@@ -84,10 +88,21 @@ const Transaction = () => {
     let response;
     try {
       const response = await axios.delete(`${url.transaction}/${id}`);
-      setResponseMessage(id);
+      setResponseMessage(Math.floor(Math.random() * 10000));
       toastify(response.data.message);
     } catch (error) {
       toastify(response.data.message);
+      console.log(error);
+    }
+  };
+  const getSingleTransactionForUpdate = async (trnsId) => {
+    try {
+      const response = await axios.get(`${url.transaction}/${trnsId}`);
+      const trans = response.data.data;
+      setAmount(trans.amount);
+      setDescription(trans.description);
+      setStatus(true);
+    } catch (error) {
       console.log(error);
     }
   };
@@ -96,7 +111,7 @@ const Transaction = () => {
     getData();
     getClients();
     console.log("running");
-  }, []);
+  }, [responseMessage]);
   const customCatStyles = {
     content: {
       top: "10%",
@@ -134,12 +149,12 @@ const Transaction = () => {
         <div className="page-header">
           <div className="row align-items-center">
             <div className="col">
-              <h3 className="page-title">Transaction</h3>
+              <h3 className="page-title">Expense</h3>
               <ul className="breadcrumb">
                 <li className="breadcrumb-item">
                   <a href="index.html">Dashboard</a>
                 </li>
-                <li className="breadcrumb-item active">Transaction List</li>
+                <li className="breadcrumb-item active">Expense List</li>
               </ul>
             </div>
           </div>
@@ -158,7 +173,7 @@ const Transaction = () => {
                       data-bs-toggle="modal"
                       data-bs-target="#add_items"
                     >
-                      <i data-feather="plus-circle"></i>Transaction
+                      <i data-feather="plus-circle"></i>Expense
                     </a>
                   </div>
                 </div>
@@ -192,8 +207,8 @@ const Transaction = () => {
                               <span
                                 onClick={() => {
                                   openModal();
-                                  status(true);
                                   setUpdateId(data._id);
+                                  getSingleTransactionForUpdate(data._id);
                                 }}
                                 className="btn btn-sm btn-white text-success me-2"
                               >
@@ -245,23 +260,6 @@ const Transaction = () => {
                   <div className="row">
                     <div className="col-lg-6 col-md-6">
                       <div className="form-group">
-                        <label>Type</label>
-                        <select
-                          required
-                          className="form-control"
-                          onChange={(type) => setType(type.target.value)}
-                        >
-                          <option value="" selected disabled>
-                            Select Type
-                          </option>
-                          <option value="income">Icome</option>
-                          <option value="expense">Expense</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="col-lg-6 col-md-6">
-                      <div className="form-group">
                         <label>Amount</label>
                         <input
                           required
@@ -292,6 +290,20 @@ const Transaction = () => {
                           )}
                         </select>
                       </div>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-12 col-md-12">
+                      <label>Description</label>
+                      <textarea
+                        required
+                        value={description}
+                        onChange={(description) =>
+                          setDescription(description.target.value)
+                        }
+                        className="form-control"
+                        placeholder="More About Transaction"
+                      ></textarea>
                     </div>
                   </div>
                 </div>

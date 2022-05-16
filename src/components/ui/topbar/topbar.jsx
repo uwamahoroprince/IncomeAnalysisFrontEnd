@@ -15,7 +15,10 @@ const TopBar = () => {
 
   return (
     <>
-      <div className="header border border-secondry">
+      <div
+        style={{ backgroundColor: "#3098ae" }}
+        className="header border border-secondry"
+      >
         <div className="header-left">
           <a href="#" className="logo">
             <img

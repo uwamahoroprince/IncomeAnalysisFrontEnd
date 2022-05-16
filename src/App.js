@@ -18,12 +18,12 @@ import BudgetView from "./pages/budgetPlan/budgetView";
 function App() {
   const user = localStorage.getItem("token");
   return (
-    <div className="App">
+    <div className="App mt-0 pt-0">
       <Router>
-        <div className="main-wrapper">
+        <div className="main-wrapper mt-0 pt-0">
           {user ? (
             <>
-              <TopBar />
+              {/* <TopBar /> */}
               <SideBar />
             </>
           ) : (
@@ -31,7 +31,7 @@ function App() {
           )}
 
           {user ? (
-            <div className="page-wrapper">
+            <div className="page-wrapper mt-0 pt-0">
               <Switch>
                 <Route exact path="/">
                   <Dashboard />

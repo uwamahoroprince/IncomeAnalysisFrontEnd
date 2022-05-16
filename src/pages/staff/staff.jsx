@@ -29,7 +29,7 @@ const Staff = () => {
           role,
         });
       } else {
-        response = await fetch(`${url.register}/${updateId}`, {
+        response = await axios.put(`${url.register}/${updateId}`, {
           name,
           userName,
           password,
@@ -38,6 +38,7 @@ const Staff = () => {
         });
       }
       setStatus(false);
+      setResponseMessage(Math.floor(Math.random() * 10000));
     } catch (error) {
       console.log(error);
     }
@@ -67,6 +68,21 @@ const Staff = () => {
       const staff = await axios.delete(`${url.register}/${id}`);
       setResponseMessage(staff.data.message);
       toastify(staff.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getSingleStaff = async (staffId) => {
+    console.log("this is staff id", staffId);
+    try {
+      const response = await axios.get(`${url.register}/${staffId}`);
+      const foundStaff = response.data.data;
+      console.log(foundStaff);
+      setName(foundStaff.name);
+      setUserName(foundStaff.userName);
+      setEmail(foundStaff.email);
+      setRole(foundStaff.role);
+      setStatus(true);
     } catch (error) {
       console.log(error);
     }
@@ -175,8 +191,9 @@ const Staff = () => {
                               <span
                                 onClick={() => {
                                   openModal();
-                                  status(true);
                                   setUpdateId(data._id);
+
+                                  getSingleStaff(data._id);
                                 }}
                                 className="btn btn-sm btn-white text-success me-2"
                               >
